@@ -34,6 +34,7 @@ rouge-score
 
     ```bash
     pip install -r requirements.txt
+    pip install rouge-score
     ```
 
 ## Usage
