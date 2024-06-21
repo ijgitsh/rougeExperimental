@@ -19,7 +19,7 @@ rouge-score
 1. Clone the repository to your local machine.
 
     ```bash
-    git clone https://github.com/yourusername/rouge-scoring-api.git
+    git clone https://github.com/ijgitsh/rougeExperimental.git
     cd rouge-scoring-api
     ```
 
