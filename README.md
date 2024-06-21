@@ -42,10 +42,10 @@ rouge-score
 1. Run the Flask application.
 
     ```bash
-    python app.py
+    python rouge.py
     ```
 
-2. The API will be available at `http://127.0.0.1:5000`.
+2. The API will be available at `http://127.0.0.1:5000`. Navigate to Index.html to show the UI or you can follow below instruction to consume the api.
 
 ## API Endpoints
 
