@@ -20,7 +20,7 @@ rouge-score
 
     ```bash
     git clone https://github.com/ijgitsh/rougeExperimental.git
-    cd rouge-scoring-api
+    cd rougeExperimental
     ```
 
 2. Create a virtual environment and activate it (optional but recommended).
