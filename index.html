@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROUGE Score Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #252526;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #569cd6;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #d4d4d4;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #007acc;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            background: #333333;
+            color: #d4d4d4;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .card span {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #569cd6;
+        }
+        .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            z-index: 1;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .card:hover .tooltip {
+            display: block;
+        }
+    </style>
+    <script>
+        async function callRougeAPI() {
+            const reference = document.getElementById('reference').value;
+            const prediction = document.getElementById('prediction').value;
+
+            console.log('Sending request with:', { reference, prediction });  // Log request data
+
+            const response = await fetch('http://127.0.0.1:5000/rouge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ reference, prediction })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Received response:', result);  // Log response data
+                displayResult(result);
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        }
+
+        function displayResult(result) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ''; // Clear previous results
+
+            for (const key in result) {
+                if (result.hasOwnProperty(key)) {
+                    const score = result[key];
+                    const explanation = getExplanation(key);
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const keySpan = document.createElement('span');
+                    keySpan.textContent = key.toUpperCase();
+
+                    const valueSpan = document.createElement('span');
+                    valueSpan.textContent = `Precision: ${score.precision.toFixed(2)}, Recall: ${score.recall.toFixed(2)}, F-Measure: ${score.fmeasure.toFixed(2)}`;
+
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.innerHTML = `
+                        <div>${explanation}</div>
+                        <ul>
+                            <li><strong>Precision:</strong> ${getDetailedExplanation('precision')}</li>
+                            <li><strong>Recall:</strong> ${getDetailedExplanation('recall')}</li>
+                            <li><strong>F-Measure:</strong> ${getDetailedExplanation('fmeasure')}</li>
+                        </ul>
+                    `;
+
+                    card.appendChild(keySpan);
+                    card.appendChild(valueSpan);
+                    card.appendChild(tooltip);
+
+                    resultDiv.appendChild(card);
+                }
+            }
+        }
+
+        function getExplanation(key) {
+            switch (key) {
+                case 'rouge1':
+                    return 'ROUGE-1 score measures the overlap of unigrams (single words) between the reference and the prediction.';
+                case 'rouge2':
+                    return 'ROUGE-2 score measures the overlap of bigrams (two-word sequences) between the reference and the prediction.';
+                case 'rougeL':
+                    return 'ROUGE-L score measures the longest common subsequence between the reference and the prediction.';
+                case 'rougeLsum':
+                    return 'ROUGE-Lsum score measures the longest common subsequence in the summary between the reference and the prediction.';
+                default:
+                    return 'No explanation available.';
+            }
+        }
+
+        function getDetailedExplanation(metric) {
+            switch (metric) {
+                case 'precision':
+                    return 'Precision is the number of correct positive results divided by the number of all positive results returned by the classifier. It indicates the accuracy of the positive predictions.';
+                case 'recall':
+                    return 'Recall is the number of correct positive results divided by the number of all relevant samples (all samples that should have been identified as positive). It indicates the ability of the model to identify all relevant instances.';
+                case 'fmeasure':
+                    return 'The F1-score is the harmonic mean of precision and recall, providing a balance between the two. It is a measure of the test\'s accuracy and takes both false positives and false negatives into account.';
+                default:
+                    return 'No detailed explanation available.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>ROUGE Score Dashboard</h1>
+        <div class="input-group">
+            <label for="reference">Reference:</label>
+            <textarea id="reference" rows="4"></textarea>
+        </div>
+        <div class="input-group">
+            <label for="prediction">Prediction:</label>
+            <textarea id="prediction" rows="4"></textarea>
+        </div>
+        <button onclick="callRougeAPI()">Calculate ROUGE Score</button>
+        <div id="result" class="dashboard"></div>
+    </div>
+</body>
+</html>
