@@ -1,5 +1,5 @@
 
-# ROUGE Scoring API
+# ROUGE Scoring Custom Dashboard
 
 This project is a Flask-based application that calculates ROUGE scores for evaluating the quality of text summaries. 
 
