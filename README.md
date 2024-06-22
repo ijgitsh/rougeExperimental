@@ -1,7 +1,7 @@
 
 # ROUGE Scoring API
 
-This project is a Flask-based API that calculates ROUGE scores for evaluating the quality of text summaries.
+This project is a Flask-based application that calculates ROUGE scores for evaluating the quality of text summaries. 
 
 ## Requirements
 
